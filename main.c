@@ -34,7 +34,7 @@ int main(){
                 printf("Consultar Extrato\n");
                 break;
             case 3:
-                printf("Depositar Reais\n");
+                depositar(&saldos);
                 break;
             case 4:
                 printf("Sacar Reais\n");

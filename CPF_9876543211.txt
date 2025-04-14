@@ -1,4 +1,4 @@
-Reais: 1352.00
+Reais: 14188.00
 Bitcoin: 0.000305
 Ethereum: 0.023000
 Ripple: 0.970000

@@ -97,6 +97,26 @@ int login(char* cpf_out){
     return -1;
 }
 
+int depositar(Saldos* saldos){
+    float valor;
+    printf("\n");
+    printf("============ Depositar ============\n");
+    printf("= Digite o valor para depositar: ");
+    scanf("%f", &valor);
+    
+    if(valor <= 0){
+        printf("\n");
+        printf("= Digite um valor positivo\n");
+        return 0;
+    }
+    
+    saldos->reais += valor;
+    printf("\n");
+    printf("=====================\n");
+    printf("= Deposito realizado\n", valor);
+    return 1;
+}
+
 int menu(){
     int opcao;
     printf("\n");
