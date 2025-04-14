@@ -16,3 +16,5 @@ int menu();
 int carregar_users(char* cpf, Saldos* saldos);
 int salvar_users(char* cpf, Saldos* saldos);
 int depositar(Saldos* saldos);
+char* validar_senha(char* cpf);
+int sacar(char* senha_usuario, Saldos* saldos);

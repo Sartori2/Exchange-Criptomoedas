@@ -117,6 +117,52 @@ int depositar(Saldos* saldos){
     return 1;
 }
 
+char* validar_senha(char* cpf){
+    for(int i = 0; i < totalUsuarios; i++){
+        if(strcmp(usuarios[i].cpf, cpf) == 0){
+            return usuarios[i].senha;
+        }
+    }
+    return NULL;
+}
+
+int sacar(char* senha_usuario, Saldos* saldos){
+    float valor;
+    char senha[7];
+
+    printf("\n");
+    printf("======== Validação ========\n");
+    printf("= Digite sua senha: ");
+    scanf("%s", senha);
+
+    if(strcmp(senha, senha_usuario) != 0){
+        printf("\n");
+        printf("= Senha incorreta\n");
+        return 0;
+    }
+
+    printf("= Digite o valor para sacar: ");
+    scanf("%f", &valor);
+    
+    if(valor <= 0){
+        printf("\n");
+        printf("= Digite um valor positivo\n");
+        return 0;
+    }
+
+    if(valor > saldos->reais){
+        printf("\n");
+        printf("= Saldo insuficiente\n");
+        return 0;
+    }
+
+    saldos->reais -= valor;
+    printf("\n");
+    printf("===== Saque =====\n");
+    printf("= Saque realizado\n", valor);
+    return 1;
+}
+
 int menu(){
     int opcao;
     printf("\n");
