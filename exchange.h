@@ -23,5 +23,6 @@ char* validar_senha(char* cpf);
 int sacar(char* senha_usuario, Saldos* saldos);
 int comprar_criptomoedas(Saldos* saldos);
 int vender_criptomoedas(Saldos* saldos);
+void atualizar_cotacao();
 
 #endif

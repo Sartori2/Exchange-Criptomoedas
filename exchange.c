@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <time.h>
 #define BANCO_USUARIOS "usuarios.txt"
 
 float valor_bitcoin = 500000.00;
@@ -265,6 +266,25 @@ int vender_criptomoedas(Saldos* saldos){
     printf("Novo saldo de Reais: R$ %.2f.\n", saldos->reais);
     return 1;
 }
+
+void atualizar_cotacao(){
+    srand(time(NULL));
+
+    float variacoes[3];
+    float* cotacoes[3] = {&valor_bitcoin, &valor_ethereum, &valor_ripple};
+
+    for(int i = 0; i < 3; i++){
+        float variacao = ((rand() % 11) - 5) / 100.0;  // -0.05 a +0.05
+        *cotacoes[i] *= (1 + variacao);
+    }
+
+    printf("\n======== Atualizar Cotação ========\n");
+    printf("Cotação atual:\n");
+    printf("Bitcoin: %.2f\n", valor_bitcoin);
+    printf("Ethereum: %.2f\n", valor_ethereum);
+    printf("Ripple: %.2f\n", valor_ripple);
+}
+
 
 int menu(){
     int opcao;

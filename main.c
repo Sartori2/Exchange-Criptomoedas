@@ -54,7 +54,7 @@ int main(){
                 vender_criptomoedas(&saldos);
                 break;
             case 7:
-                printf("Atualizar Cotação\n");
+                atualizar_cotacao();
                 break;
             case 8:
                 printf("Fechando Programa\n");
