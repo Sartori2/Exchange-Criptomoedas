@@ -18,11 +18,12 @@ int login(char* cpf_out);
 int menu();
 int carregar_users(char* cpf, Saldos* saldos);
 int salvar_users(char* cpf, Saldos* saldos);
-int depositar(Saldos* saldos);
+int consultar_extrato(char* cpf);
+int depositar(Saldos* saldos, char* cpf);
 char* validar_senha(char* cpf);
-int sacar(char* senha_usuario, Saldos* saldos);
-int comprar_criptomoedas(Saldos* saldos);
-int vender_criptomoedas(Saldos* saldos);
+int sacar(char* senha_usuario, Saldos* saldos, char* cpf);
+int comprar_criptomoedas(Saldos* saldos, char* cpf);
+int vender_criptomoedas(Saldos* saldos, char* cpf);
 void atualizar_cotacao();
 
 #endif

@@ -1,4 +1,5 @@
-Reais: R$0.00
-Bitcoin: BTC0.00
-Ethereum: ETH0.00
-Ripple: XRP0.00
+CPF: 1234567890
+Reais: R$988.00
+Bitcoin: BTC0.0000000
+Ethereum: ETH0.0000000
+Ripple: XRP1.0000000

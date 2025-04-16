@@ -31,10 +31,10 @@ int main(){
                 printf("\n");
                 break;
             case 2:
-                printf("Consultar Extrato\n");
+                consultar_extrato(cpf);
                 break;
             case 3:
-                depositar(&saldos);
+                depositar(&saldos, cpf);
                 break;
             case 4: {
                 char* senha_usuario = validar_senha(cpf);
@@ -43,15 +43,15 @@ int main(){
                     break;
                 }
               
-                sacar(senha_usuario, &saldos);
+                sacar(senha_usuario, &saldos, cpf);
                 break;
             }  
   
             case 5:
-                comprar_criptomoedas(&saldos);
+                comprar_criptomoedas(&saldos, cpf);
                 break;
             case 6:
-                vender_criptomoedas(&saldos);
+                vender_criptomoedas(&saldos, cpf);
                 break;
             case 7:
                 atualizar_cotacao();

@@ -17,15 +17,15 @@ struct usuario usuarios[10] = {
 
 int totalUsuarios = 2;
 
-int carregar_users(char* cpf, Saldos* saldos){
+int carregar_users(char* cpf, Saldos* saldos) {
     char filename[20];
     sprintf(filename, "CPF_%s.txt", cpf);
 
     FILE* file = fopen(filename, "r");
-
-    if(file == NULL){
+    if (file == NULL) {
         file = fopen(filename, "w");
-        if(file == NULL){
+        if (file == NULL) {
+            printf("Erro ao criar o arquivo.\n");
             return 0;
         }
 
@@ -43,18 +43,18 @@ int carregar_users(char* cpf, Saldos* saldos){
         return 1;
     }
 
-    char linha[50];
-    while (fgets(linha, sizeof(linha), file) != NULL){
-        if(strstr(linha, "Reais:")){
+    char linha[100];
+    while (fgets(linha, sizeof(linha), file) != NULL) {
+        if (strstr(linha, "Reais:")) {
             sscanf(linha, "Reais: %f", &saldos->reais);
         } 
-        else if(strstr(linha, "Bitcoin:")){
+        else if (strstr(linha, "Bitcoin:")) {
             sscanf(linha, "Bitcoin: %f", &saldos->bitcoin);
         }
-        else if(strstr(linha, "Ethereum:")){
+        else if (strstr(linha, "Ethereum:")) {
             sscanf(linha, "Ethereum: %f", &saldos->ethereum);
         }
-        else if(strstr(linha, "Ripple:")){
+        else if (strstr(linha, "Ripple:")) {
             sscanf(linha, "Ripple: %f", &saldos->ripple);
         }
     }
@@ -62,19 +62,21 @@ int carregar_users(char* cpf, Saldos* saldos){
     return 1;
 }
 
-int salvar_users(char* cpf, Saldos* saldos){
+int salvar_users(char* cpf, Saldos* saldos) {
     char filename[20];
     sprintf(filename, "CPF_%s.txt", cpf);
 
     FILE* file = fopen(filename, "w");
-    if(file == NULL){
-        return 0; 
+    if (file == NULL) {
+        printf("Erro ao abrir o arquivo.\n");
+        return 0;
     }
 
+    fprintf(file, "CPF: %s\n", cpf);
     fprintf(file, "Reais: R$%.2f\n", saldos->reais);
-    fprintf(file, "Bitcoin: BTC%.2f\n", saldos->bitcoin);
-    fprintf(file, "Ethereum: ETH%.2f\n", saldos->ethereum);
-    fprintf(file, "Ripple: XRP%.2f\n", saldos->ripple);
+    fprintf(file, "Bitcoin: BTC%.7f\n", saldos->bitcoin);
+    fprintf(file, "Ethereum: ETH%.7f\n", saldos->ethereum);
+    fprintf(file, "Ripple: XRP%.7f\n", saldos->ripple);
 
     fclose(file);
     return 1;
@@ -103,7 +105,26 @@ int login(char* cpf_out){
     return -1;
 }
 
-int depositar(Saldos* saldos){
+int consultar_extrato(char* cpf){
+    char filename[30];
+    sprintf(filename, "CPF_%s.txt", cpf);
+
+    FILE* file = fopen(filename, "r");
+    if(file == NULL){
+        printf("Erro ao abrir o arquivo de extrato.\n");
+        return 0;
+    }
+
+    char linha[100];
+    printf("\n======== Extrato ========\n");
+    while(fgets(linha, sizeof(linha), file)){
+        printf("%s", linha);
+    }
+    fclose(file);
+    return 1;
+}
+
+int depositar(Saldos* saldos, char* cpf){
     float valor;
     printf("\n");
     printf("============ Depositar ============\n");
@@ -117,6 +138,17 @@ int depositar(Saldos* saldos){
     }
 
     saldos->reais += valor;
+
+    if (!salvar_users(cpf, saldos)) {
+        printf("Erro ao salvar os dados do usuário.\n");
+        return 0;
+    }
+
+    FILE* extrato = fopen("extrato_CPF.txt", "a");
+    fprintf(extrato, "Depósito: R$ %.2f\n", valor);
+    fclose(extrato);
+
+
     printf("\n");
     printf("=====================\n");
     printf("= Deposito realizado\n", valor);
@@ -132,7 +164,7 @@ char* validar_senha(char* cpf){
     return NULL;
 }
 
-int sacar(char* senha_usuario, Saldos* saldos){
+int sacar(char* senha_usuario, Saldos* saldos, char* cpf){
     float valor;
     char senha[7];
 
@@ -161,15 +193,26 @@ int sacar(char* senha_usuario, Saldos* saldos){
         printf("= Saldo insuficiente\n");
         return 0;
     }
-
+    
     saldos->reais -= valor;
+
+    if (!salvar_users(cpf, saldos)) {
+        printf("Erro ao salvar os dados do usuário.\n");
+        return 0;
+    }
+    
+
+    FILE* extrato = fopen("extrato_CPF.txt", "a");
+    fprintf(extrato, "Saque: R$ %.2f\n", valor);
+    fclose(extrato);
+
     printf("\n");
     printf("===== Saque =====\n");
     printf("= Saque realizado\n", valor);
     return 1;
 }
 
-int comprar_criptomoedas(Saldos* saldos) {
+int comprar_criptomoedas(Saldos* saldos, char* cpf) {
     int opcoes;
     float preco, quantidade = 0.0;
 
@@ -211,11 +254,33 @@ int comprar_criptomoedas(Saldos* saldos) {
 
     saldos->reais -= preco;
 
+    time_t t;
+    struct tm* tm_info;
+    char data_hora[25];  
+
+    time(&t);
+    tm_info = localtime(&t);
+    strftime(data_hora, sizeof(data_hora), "%Y-%m-%d %H:%M:%S", tm_info);
+
+    FILE* extrato = fopen("extrato_CPF.txt", "a");
+    switch (opcoes) {
+        case 1:
+            fprintf(extrato, "Compra: %.7f BTC - R$ %.2f em %s\n", quantidade, preco, data_hora);
+            break;
+        case 2:
+            fprintf(extrato, "Compra: %.7f ETH - R$ %.2f em %s\n", quantidade, preco, data_hora);
+            break;
+        case 3:
+            fprintf(extrato, "Compra: %.7f XRP - R$ %.2f em %s\n", quantidade, preco, data_hora);
+            break;
+    }
+    fclose(extrato);
+
     printf("= Compra realizada com sucesso\n");
     return 1;
 }
 
-int vender_criptomoedas(Saldos* saldos){
+int vender_criptomoedas(Saldos* saldos, char* cpf) {
     int opcoes;
     float quantia;
 
@@ -262,6 +327,34 @@ int vender_criptomoedas(Saldos* saldos){
     }
 
     saldos->reais += valor_reais;
+
+    if (!salvar_users(cpf, saldos)) {
+        printf("Erro ao salvar os dados do usuário.\n");
+        return 0;
+    }
+
+    time_t t;
+    struct tm* tm_info;
+    char data_hora[25];
+
+    time(&t);
+    tm_info = localtime(&t);
+    strftime(data_hora, sizeof(data_hora), "%Y-%m-%d %H:%M:%S", tm_info);
+
+    FILE* extrato = fopen("extrato_CPF.txt", "a");
+    switch(opcoes) {
+        case 1:
+            fprintf(extrato, "Venda: %.7f BTC - R$ %.2f em %s\n", quantia, valor_reais, data_hora);
+            break;
+        case 2:
+            fprintf(extrato, "Venda: %.7f ETH - R$ %.2f em %s\n", quantia, valor_reais, data_hora);
+            break;
+        case 3:
+            fprintf(extrato, "Venda: %.7f XRP - R$ %.2f em %s\n", quantia, valor_reais, data_hora);
+            break;
+    }
+    fclose(extrato);
+
     printf("Venda realizada com sucesso: R$ %.2f.\n", valor_reais);
     printf("Novo saldo de Reais: R$ %.2f.\n", saldos->reais);
     return 1;
