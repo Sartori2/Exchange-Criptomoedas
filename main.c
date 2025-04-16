@@ -36,19 +36,22 @@ int main(){
             case 3:
                 depositar(&saldos);
                 break;
-            case 4: 
+            case 4: {
                 char* senha_usuario = validar_senha(cpf);
                 if(senha_usuario == NULL){
                     printf("Usuario não encontrado\n");
                     break;
                 }
-                sacar((char*)senha_usuario, &saldos);
+              
+                sacar(senha_usuario, &saldos);
                 break;
+            }  
+  
             case 5:
-                printf("Comprar Criptomoedas\n");
+                comprar_criptomoedas(&saldos);
                 break;
             case 6:
-                printf("Vender Criptomoedas\n");
+                vender_criptomoedas(&saldos);
                 break;
             case 7:
                 printf("Atualizar Cotação\n");

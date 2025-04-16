@@ -4,6 +4,11 @@
 #include <stdlib.h>
 #define BANCO_USUARIOS "usuarios.txt"
 
+float valor_bitcoin = 500000.00;
+float valor_ethereum = 10000.00;
+float valor_ripple = 12.00;
+
+
 struct usuario usuarios[10] = {
     {"1234567890", "12345"},
     {"9876543211", "54321"}
@@ -14,22 +19,22 @@ int totalUsuarios = 2;
 int carregar_users(char* cpf, Saldos* saldos){
     char filename[20];
     sprintf(filename, "CPF_%s.txt", cpf);
-    
+
     FILE* file = fopen(filename, "r");
-    
+
     if(file == NULL){
         file = fopen(filename, "w");
         if(file == NULL){
             return 0;
         }
-        
+
         fprintf(file, "CPF: %s\n", cpf);
         fprintf(file, "Reais: 0.00\n");
         fprintf(file, "Bitcoin: 0.0000000\n");
         fprintf(file, "Ethereum: 0.0000000\n");
         fprintf(file, "Ripple: 0.0000000\n");
         fclose(file);
-        
+
         saldos->reais = 0;
         saldos->bitcoin = 0;
         saldos->ethereum = 0;
@@ -59,17 +64,17 @@ int carregar_users(char* cpf, Saldos* saldos){
 int salvar_users(char* cpf, Saldos* saldos){
     char filename[20];
     sprintf(filename, "CPF_%s.txt", cpf);
-    
+
     FILE* file = fopen(filename, "w");
     if(file == NULL){
         return 0; 
     }
-    
-    fprintf(file, "Reais: %.2f\n", saldos->reais);
-    fprintf(file, "Bitcoin: %f\n", saldos->bitcoin);
-    fprintf(file, "Ethereum: %f\n", saldos->ethereum);
-    fprintf(file, "Ripple: %f\n", saldos->ripple);
-    
+
+    fprintf(file, "Reais: R$%.2f\n", saldos->reais);
+    fprintf(file, "Bitcoin: BTC%.2f\n", saldos->bitcoin);
+    fprintf(file, "Ethereum: ETH%.2f\n", saldos->ethereum);
+    fprintf(file, "Ripple: XRP%.2f\n", saldos->ripple);
+
     fclose(file);
     return 1;
 }
@@ -103,13 +108,13 @@ int depositar(Saldos* saldos){
     printf("============ Depositar ============\n");
     printf("= Digite o valor para depositar: ");
     scanf("%f", &valor);
-    
+
     if(valor <= 0){
         printf("\n");
         printf("= Digite um valor positivo\n");
         return 0;
     }
-    
+
     saldos->reais += valor;
     printf("\n");
     printf("=====================\n");
@@ -143,7 +148,7 @@ int sacar(char* senha_usuario, Saldos* saldos){
 
     printf("= Digite o valor para sacar: ");
     scanf("%f", &valor);
-    
+
     if(valor <= 0){
         printf("\n");
         printf("= Digite um valor positivo\n");
@@ -160,6 +165,104 @@ int sacar(char* senha_usuario, Saldos* saldos){
     printf("\n");
     printf("===== Saque =====\n");
     printf("= Saque realizado\n", valor);
+    return 1;
+}
+
+int comprar_criptomoedas(Saldos* saldos) {
+    int opcoes;
+    float preco, quantidade = 0.0;
+
+    printf("\n======== Comprar Criptomoedas ========\n");
+    printf("1: Bitcoin - %.2f\n", valor_bitcoin);
+    printf("2: Ethereum - %.2f\n", valor_ethereum);
+    printf("3: Ripple - %.2f\n", valor_ripple);
+    printf("= Escolha uma opção: ");
+    scanf("%d", &opcoes);
+
+    printf("= Digite o valor, em reais, para comprar: ");
+    scanf("%f", &preco);
+
+    if (preco <= 0 || preco > saldos->reais) {
+        printf("= Saldo insuficiente ou valor inválido\n");
+        return 0;
+    }
+
+    switch (opcoes) {
+        case 1:
+            quantidade = preco / valor_bitcoin;
+            saldos->bitcoin += quantidade;
+            printf("= Você comprou %.7f BTC\n", quantidade);
+            break;
+        case 2:
+            quantidade = preco / valor_ethereum;
+            saldos->ethereum += quantidade;
+            printf("= Você comprou %.7f ETH\n", quantidade);
+            break;
+        case 3:
+            quantidade = preco / valor_ripple;
+            saldos->ripple += quantidade;
+            printf("= Você comprou %.7f XRP\n", quantidade);
+            break;
+        default:
+            printf("= Opção inválida\n");
+            return 0;
+    }
+
+    saldos->reais -= preco;
+
+    printf("= Compra realizada com sucesso\n");
+    return 1;
+}
+
+int vender_criptomoedas(Saldos* saldos){
+    int opcoes;
+    float quantia;
+
+    printf("\n======== Vender Criptomoedas ========\n");
+    printf("1: Bitcoin\n", valor_bitcoin);
+    printf("2: Ethereum\n", valor_ethereum);
+    printf("3: Ripple\n", valor_ripple);
+    printf("= Escolha uma opção: ");
+    scanf("%d", &opcoes);
+
+    printf("= Digite a quantidade que deseja vender: ");
+    scanf("%f", &quantia);
+
+    float valor_reais = 0.0;
+
+    switch(opcoes){
+        case 1:
+            if(quantia > saldos->bitcoin){
+                printf("Saldo insuficiente de Bitcoin.\n");
+                return 0;
+            }
+            saldos->bitcoin -= quantia;
+            valor_reais = quantia * valor_bitcoin;
+            break;
+        case 2:
+            if(quantia > saldos->ethereum){
+                printf("Saldo insuficiente de Ethereum.\n");
+                return 0;
+            }
+            saldos->ethereum -= quantia;
+            valor_reais = quantia * valor_ethereum;
+            break;
+        case 3:
+            if(quantia > saldos->ripple){
+                printf("Saldo insuficiente de Ripple.\n");
+                return 0;
+            }
+            saldos->ripple -= quantia;
+            valor_reais = quantia * valor_ripple;
+            break;
+        default:
+            printf("Opção inválida.\n");
+            return 0;        
+    }
+
+    saldos->reais += valor_reais;
+    printf("Venda realizada com sucesso: R$ %.2f.\n", valor_reais);
+    printf("Novo saldo de Reais: R$ %.2f.\n", saldos->reais);
     return 1;
 }
 

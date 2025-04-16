@@ -1,4 +1,4 @@
-Reais: 500.00
-Bitcoin: 0.000000
-Ethereum: 0.000000
-Ripple: 0.000000
+Reais: R$0.00
+Bitcoin: BTC0.00
+Ethereum: ETH0.00
+Ripple: XRP0.00
