@@ -21,7 +21,7 @@ int carregar_users(char* cpf, Saldos* saldos) {
     char filename[20];
     sprintf(filename, "CPF_%s.txt", cpf);
 
-    FILE* file = fopen(filename, "r");
+    FILE* file = fopen(filename, "r+");
     if (file == NULL) {
         file = fopen(filename, "w");
         if (file == NULL) {
@@ -66,17 +66,17 @@ int salvar_users(char* cpf, Saldos* saldos) {
     char filename[20];
     sprintf(filename, "CPF_%s.txt", cpf);
 
-    FILE* file = fopen(filename, "w");
+    FILE* file = fopen(filename, "r+");
     if (file == NULL) {
         printf("Erro ao abrir o arquivo.\n");
         return 0;
     }
 
     fprintf(file, "CPF: %s\n", cpf);
-    fprintf(file, "Reais: R$%.2f\n", saldos->reais);
-    fprintf(file, "Bitcoin: BTC%.7f\n", saldos->bitcoin);
-    fprintf(file, "Ethereum: ETH%.7f\n", saldos->ethereum);
-    fprintf(file, "Ripple: XRP%.7f\n", saldos->ripple);
+    fprintf(file, "Reais: %.2f\n", saldos->reais);
+    fprintf(file, "Bitcoin: %.7f\n", saldos->bitcoin);
+    fprintf(file, "Ethereum: %.7f\n", saldos->ethereum);
+    fprintf(file, "Ripple: %.7f\n", saldos->ripple);
 
     fclose(file);
     return 1;
@@ -144,14 +144,16 @@ int depositar(Saldos* saldos, char* cpf){
         return 0;
     }
 
-    FILE* extrato = fopen("extrato_CPF.txt", "a");
+    char filename[30];
+    sprintf(filename, "extrato_%s.txt", cpf);
+    FILE* extrato = fopen(filename, "a");
     fprintf(extrato, "Depósito: R$ %.2f\n", valor);
     fclose(extrato);
 
 
     printf("\n");
     printf("=====================\n");
-    printf("= Deposito realizado\n", valor);
+    printf("= Deposito realizado\n");
     return 1;
 }
 
@@ -202,9 +204,12 @@ int sacar(char* senha_usuario, Saldos* saldos, char* cpf){
     }
     
 
-    FILE* extrato = fopen("extrato_CPF.txt", "a");
-    fprintf(extrato, "Saque: R$ %.2f\n", valor);
+    char filename[30];
+    sprintf(filename, "extrato_%s.txt", cpf);
+    FILE* extrato = fopen(filename, "a");
+    fprintf(extrato, "Depósito: R$ %.2f\n", valor);
     fclose(extrato);
+
 
     printf("\n");
     printf("===== Saque =====\n");
@@ -213,6 +218,7 @@ int sacar(char* senha_usuario, Saldos* saldos, char* cpf){
 }
 
 int comprar_criptomoedas(Saldos* saldos, char* cpf) {
+    float valor;
     int opcoes;
     float preco, quantidade = 0.0;
 
@@ -262,18 +268,10 @@ int comprar_criptomoedas(Saldos* saldos, char* cpf) {
     tm_info = localtime(&t);
     strftime(data_hora, sizeof(data_hora), "%Y-%m-%d %H:%M:%S", tm_info);
 
-    FILE* extrato = fopen("extrato_CPF.txt", "a");
-    switch (opcoes) {
-        case 1:
-            fprintf(extrato, "Compra: %.7f BTC - R$ %.2f em %s\n", quantidade, preco, data_hora);
-            break;
-        case 2:
-            fprintf(extrato, "Compra: %.7f ETH - R$ %.2f em %s\n", quantidade, preco, data_hora);
-            break;
-        case 3:
-            fprintf(extrato, "Compra: %.7f XRP - R$ %.2f em %s\n", quantidade, preco, data_hora);
-            break;
-    }
+    char filename[30];
+    sprintf(filename, "extrato_%s.txt", cpf);
+    FILE* extrato = fopen(filename, "a");
+    fprintf(extrato, "Depósito: R$ %.2f\n", valor);
     fclose(extrato);
 
     printf("= Compra realizada com sucesso\n");
@@ -281,6 +279,7 @@ int comprar_criptomoedas(Saldos* saldos, char* cpf) {
 }
 
 int vender_criptomoedas(Saldos* saldos, char* cpf) {
+    float valor;
     int opcoes;
     float quantia;
 
@@ -341,18 +340,10 @@ int vender_criptomoedas(Saldos* saldos, char* cpf) {
     tm_info = localtime(&t);
     strftime(data_hora, sizeof(data_hora), "%Y-%m-%d %H:%M:%S", tm_info);
 
-    FILE* extrato = fopen("extrato_CPF.txt", "a");
-    switch(opcoes) {
-        case 1:
-            fprintf(extrato, "Venda: %.7f BTC - R$ %.2f em %s\n", quantia, valor_reais, data_hora);
-            break;
-        case 2:
-            fprintf(extrato, "Venda: %.7f ETH - R$ %.2f em %s\n", quantia, valor_reais, data_hora);
-            break;
-        case 3:
-            fprintf(extrato, "Venda: %.7f XRP - R$ %.2f em %s\n", quantia, valor_reais, data_hora);
-            break;
-    }
+    char filename[30];
+    sprintf(filename, "extrato_%s.txt", cpf);
+    FILE* extrato = fopen(filename, "a");
+    fprintf(extrato, "Depósito: R$ %.2f\n", valor);
     fclose(extrato);
 
     printf("Venda realizada com sucesso: R$ %.2f.\n", valor_reais);
