@@ -36,3 +36,7 @@ Saldo em Ethereum
 Saldo em Ripple
 
 Além disso, o programa mantém um arquivo de extrato extrato_CPF.txt para cada usuário, onde são registradas as transações realizadas.
+
+Usuários: CPF / SENHA
+ 1234567890  /  12345
+ 9876543211  /  54321
